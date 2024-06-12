@@ -53,8 +53,6 @@ ORDER BY (precios) DESC
  
  -- 7 listar los clientes que han realizado mas de un pedido
   
-  -- no me dio 
-  
  select * from gourmetdelight_clientes;
 select * from gourmetdelight_pedidos;
 
