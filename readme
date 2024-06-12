@@ -1,4 +1,3 @@
--- consultas
 use Gourmet;
 
 
@@ -19,6 +18,8 @@ where c.nombre='Juan Perez';
 
 select * from gourmetdelight_detallespedidos;
 select * from gourmetdelight_menus;
+
+
 
 select p.id_pedidos,m.nombre,p.cantidad,p.precio_unitario
 from gourmetdelight_detallespedidos as p
@@ -96,3 +97,90 @@ from gourmetdelight_pedidos as p
 inner join gourmetdelight_detallespedidos as dp on p.id_pedidos=dp.id_pedidos
 inner join gourmetdelight_menus as m on dp.id_menus=m.id_menus
 where p.id_clientes='1';
+
+-- procedimientos 
+-- 1.Crear un procedimiento almacenado para agregar un nuevo
+-- cliente
+
+DELIMITER $$
+ 
+create procedure Agregarcliente(
+IN P_nombre varchar(100),
+IN P_correo_electronico varchar(100),
+IN P_telefono varchar(15),
+IN P_fecha_registro date
+)
+BEGIN 
+    INSERT INTO gourmetdelight_clientes(P_nombre, P_correo_electronico,P_telefono,P_fecha_registro) 
+    VALUES (P_nombre,P_correo_electronico,P_telefono,P_fecha_registro);
+ End $$
+
+DELIMITER ; 
+
+CALL Agregarcliente('camila','camila@hotmail.com','123435','2024-06-13');
+
+-- 2.Crear un procedimiento almacenado para obtener los
+-- detalles de un pedido
+
+DELIMITER $$
+CREATE PROCEDURE eliminar_cliente_pedidos (
+    IN p_id_cliente INT
+)
+BEGIN
+    DECLARE v_msg VARCHAR(255);
+   
+    IF NOT EXISTS (SELECT 1 FROM gourmetdelight_clientes WHERE id_clientes = p_id_cliente) THEN
+        SET v_msg = CONCAT('El ID ingresado no existe: ', p_id_cliente);
+        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = v_msg;
+    ELSE
+        DELETE FROM gourmetdelight_detallespedidos WHERE id_pedidos IN (SELECT id_pedidos FROM gourmetdelight_pedidos WHERE id_clientes = p_id_cliente);
+        DELETE FROM gourmetdelight_pedidos WHERE id_clientes = p_id_cliente;
+        DELETE FROM gourmetdelight_clientes WHERE id_clientes = p_id_cliente;
+        SET v_msg = CONCAT('Se eliminó correctamente el cliente y sus pedidos con ID: ', p_id_cliente);
+        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = v_msg;
+    END IF;
+END$$
+DELIMITER ;
+
+call  eliminar_cliente_pedidos(2); 
+-- 3 Crear un procedimiento almacenado para actualizar el
+-- precio de un menú
+DELIMITER $$
+
+CREATE PROCEDURE ActualizarPrecioMenu(
+ IN P_id_menus int ,
+ IN P_precio decimal(10,2)
+ )
+ begin 
+    UPDATE gourmetdelight_menus
+    SET
+        precio = P_precio
+    WHERE id_menus = P_id_menus;
+END$$
+
+DELIMITER ;
+
+--4 Crear un procedimiento almacenado para eliminar un cliente
+-- y sus pedidos
+
+DELIMITER $$
+CREATE PROCEDURE eliminar_cliente_y_pedidos (
+    IN p_id_cliente INT
+)
+BEGIN
+    DECLARE v_msg VARCHAR(255);
+   
+    IF NOT EXISTS (SELECT 1 FROM gourmetdelight_clientes WHERE id_clientes = p_id_cliente) THEN
+        SET v_msg = CONCAT('El ID de cliente ingresado no existe: ', p_id_cliente);
+        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = v_msg;
+    ELSE
+        DELETE FROM gourmetdelight_detallespedidos WHERE id_pedidos IN (SELECT id_pedidos FROM gourmetdelight_pedidos WHERE id_clientes = p_id_cliente);
+        DELETE FROM gourmetdelight_pedidos WHERE id_clientes = p_id_cliente;
+        DELETE FROM gourmetdelight_clientes WHERE id_clientes = p_id_cliente;
+        SET v_msg = CONCAT('Se eliminó correctamente el cliente y sus pedidos con ID: ', p_id_cliente);
+        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = v_msg;
+    END IF;
+END$$
+DELIMITER ;
+select * from gourmetdelight_clientes;
+call eliminar_cliente_y_pedidos(1); 
