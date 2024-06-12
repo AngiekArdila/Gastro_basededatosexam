@@ -1,3 +1,4 @@
+-- CONSULTAS
 use Gourmet;
 
 
@@ -98,7 +99,9 @@ inner join gourmetdelight_detallespedidos as dp on p.id_pedidos=dp.id_pedidos
 inner join gourmetdelight_menus as m on dp.id_menus=m.id_menus
 where p.id_clientes='1';
 
--- procedimientos 
+
+PROCEDIMIENTOS 
+
 -- 1.Crear un procedimiento almacenado para agregar un nuevo
 -- cliente
 
@@ -143,8 +146,12 @@ END$$
 DELIMITER ;
 
 call  eliminar_cliente_pedidos(2); 
+
+
 -- 3 Crear un procedimiento almacenado para actualizar el
 -- precio de un menú
+
+
 DELIMITER $$
 
 CREATE PROCEDURE ActualizarPrecioMenu(
@@ -160,8 +167,9 @@ END$$
 
 DELIMITER ;
 
---4 Crear un procedimiento almacenado para eliminar un cliente
+-- 4 Crear un procedimiento almacenado para eliminar un cliente
 -- y sus pedidos
+
 
 DELIMITER $$
 CREATE PROCEDURE eliminar_cliente_y_pedidos (
@@ -184,3 +192,38 @@ END$$
 DELIMITER ;
 select * from gourmetdelight_clientes;
 call eliminar_cliente_y_pedidos(1); 
+
+
+
+-- 5 Crear un procedimiento almacenado para obtener el total
+-- gastado por un cliente
+-- Enunciado: Crea un procedimiento almacenado llamado TotalGastadoPorCliente que reciba
+-- como parámetro el ID del cliente y devuelva el total gastado por ese cliente en todos sus pedidos.
+
+
+DELIMITER //
+CREATE PROCEDURE TotalGastadoPorCliente
+    (IN ClienteID INT)
+BEGIN
+    SELECT SUM(p.total)
+    FROM gourmetdelight_pedidos p
+    WHERE p.id_clientes = ClienteID;
+END //
+DELIMITER ;
+
+call TotalGastadoPorCliente(1);
+
+
+
+
+
+ 
+
+
+
+
+
+ 
+ 
+ 
+
