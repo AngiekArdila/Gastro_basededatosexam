@@ -1,0 +1,98 @@
+-- consultas
+use Gourmet;
+
+
+-- 1 Obtener la lista de todos los menús con sus precios
+
+select m.id_menus,m.nombre,m.precio 
+from gourmetdelight_menus as m;
+
+-- 2  Encontrar todos los pedidos realizados por el cliente 'Juan perez'
+
+Select c.nombre,p.id_pedidos,p.fecha,p.total
+from gourmetdelight_clientes as c 
+inner join gourmetdelight_pedidos as p on c.id_clientes=p.id_clientes
+where c.nombre='Juan Perez';
+
+-- 3 Listar los detalles de todos los pedidos, incluyendo el nombre del
+--  menu,cantidad y precio unitario
+
+select * from gourmetdelight_detallespedidos;
+select * from gourmetdelight_menus;
+
+select p.id_pedidos,m.nombre,p.cantidad,p.precio_unitario
+from gourmetdelight_detallespedidos as p
+inner join gourmetdelight_menus as m on p.id_menus=m.id_menus;
+
+-- 4 calcular el total gastado por cada cliente en todos sus pedidos 
+
+select * from gourmetdelight_clientes;
+select * from gourmetdelight_pedidos;
+
+select c.nombre,sum(p.total) 
+from gourmetdelight_clientes as c
+inner join gourmetdelight_pedidos as p on c.id_clientes=p.id_clientes
+GROUP BY c.nombre;
+
+ -- 5 encontrar los menus con un precio mayor a $10 
+ 
+ select * from gourmetdelight_menus;
+ 
+ select m.nombre,m.precio 
+ from gourmetdelight_menus as m 
+ where m.precio>'10.00';
+ 
+ -- 6 obtener el menu mas caro pedido al menos una vez 
+ 
+select m.nombre,m.precio as precios
+ from gourmetdelight_menus as m 
+ORDER BY (precios) DESC
+ limit 1;
+ 
+ -- 7 listar los clientes que han realizado mas de un pedido
+  
+  -- no me dio 
+  
+ select * from gourmetdelight_clientes;
+select * from gourmetdelight_pedidos;
+
+select COUNT(p.id_clientes) as conteo,c.nombre,c.correo_electronico
+from gourmetdelight_clientes as c
+inner join gourmetdelight_pedidos as p on c.id_clientes=p.id_clientes
+where conteo>1
+group by c.nombre
+;
+
+-- 8 obtener el cliente con el mayor gasto total 
+select * from gourmetdelight_clientes;
+select * from gourmetdelight_pedidos;
+
+select c.nombre,max(p.total)
+from gourmetdelight_clientes as c
+inner join gourmetdelight_pedidos as p on c.id_clientes=p.id_clientes
+group by c.nombre 
+limit 1;
+
+-- 9 mostrar el pedido mas reciente de cada cliente 
+
+select * from gourmetdelight_clientes;
+select * from gourmetdelight_pedidos;
+
+select c.nombre,p.fecha,p.total
+from gourmetdelight_clientes as c
+inner join gourmetdelight_pedidos as p on c.id_clientes=p.id_clientes
+order by (p.fecha)desc
+;
+
+-- 10 obtener el detalle de pedidos(menus y cantidades) para el cliente 'juan perez'
+
+
+select * from gourmetdelight_menus;
+select * from gourmetdelight_detallespedidos;
+select * from gourmetdelight_pedidos;
+
+select p.id_clientes,m.nombre,dp.cantidad,dp.precio_unitario
+from gourmetdelight_pedidos as p 
+inner join gourmetdelight_detallespedidos as dp on p.id_pedidos=dp.id_pedidos
+inner join gourmetdelight_menus as m on dp.id_menus=m.id_menus
+where p.id_clientes='1';
